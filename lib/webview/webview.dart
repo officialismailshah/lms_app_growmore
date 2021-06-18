@@ -11,18 +11,14 @@ class WebViewExample extends StatefulWidget {
 
 class WebViewExampleState extends State<WebViewExample> {
   Completer<WebViewController> controller = Completer<WebViewController>();
+  WebViewController? _controller;
 
-  Future<bool> _willPopCallback() async {
-    WebViewController webViewController = await controller.future;
-    // await webViewController.canGoForward();
-    if (await webViewController.canGoForward()) {
-      webViewController.canGoForward();
-      return true;
-    } else if (await webViewController.canGoBack()) {
-      webViewController.canGoBack();
-      return false;
+  Future<bool> _onWillPop(BuildContext context) async {
+    if (await _controller!.canGoBack()) {
+      _controller!.goBack();
+      return Future.value(true);
     } else {
-      return true;
+      return Future.value(false);
     }
   }
 
@@ -38,7 +34,7 @@ class WebViewExampleState extends State<WebViewExample> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: WillPopScope(
-        onWillPop: () => _willPopCallback(),
+        onWillPop: () => _onWillPop(context),
         child: SafeArea(
           child: WebView(
             initialUrl: 'https://lms.growmore.pk',
